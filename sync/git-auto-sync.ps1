@@ -1,4 +1,4 @@
-# ============================================
+﻿# ============================================
 # Git Auto-Sync Script (Windows版)
 # PC ↔ Chromebook 自動同期スクリプト
 # ============================================
@@ -173,3 +173,4 @@ switch ($Action) {
     "sync"   { Invoke-Pull; Write-Host ""; Invoke-Push }
     "status" { Show-Status }
 }
+
