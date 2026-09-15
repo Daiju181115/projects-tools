@@ -1,0 +1,127 @@
+{
+  "_comment": "KaraokeMaker 開発進捗ファイル。このファイルを更新すると Project Hub に自動反映されます。",
+  "_usage": "python tools/sync-progress.py [--complete <id>] [--status <status>] [--list]",
+  "projectId": "karaoke-maker",
+  "projectName": "KaraokeMaker",
+  "status": "planning",
+  "progress": 5,
+  "currentVersion": "v0.0.0-phase0",
+  "updatedAt": "2026-09-16",
+  "milestones": {
+    "km-p0-1": {
+      "title": "【Phase 0 PoC】Electron + Python IPC 通信の疎通確認",
+      "phase": "Phase 0",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p0-2": {
+      "title": "【Phase 0 PoC】onnxruntime-directml で AMD RX 6800 推論実行確認",
+      "phase": "Phase 0",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p0-3": {
+      "title": "【Phase 0 PoC】Whisper ONNX fp16 / large-v3 の VRAM・速度実測",
+      "phase": "Phase 0",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p0-4": {
+      "title": "【Phase 0 PoC】stable-ts + DirectML 動作確認（フォールバック要否判断）",
+      "phase": "Phase 0",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p0-5": {
+      "title": "【Phase 0 PoC】5分超音声チャンク化処理の動作確認",
+      "phase": "Phase 0",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p1-1": {
+      "title": "【Phase 1】マルチGPU自動検出モジュール（DXGI アダプター列挙）",
+      "phase": "Phase 1",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p1-2": {
+      "title": "【Phase 1】ヘッダー GPU セレクター UI + 動的切替基盤",
+      "phase": "Phase 1",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p1-3": {
+      "title": "【Phase 1】ファイル読み込み画面",
+      "phase": "Phase 1",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p1-4": {
+      "title": "【Phase 1】解析プログレス画面（IPC ストリーム・VRAM ゲージ）",
+      "phase": "Phase 1",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p1-5": {
+      "title": "【Phase 1】タイムラインエディタ Step A（歌詞ブロック表示・移動のみ）← 最重要",
+      "phase": "Phase 1",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p1-6": {
+      "title": "【Phase 1】ボーカル / インスト ON/OFF 再生コントロール",
+      "phase": "Phase 1",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p2-1": {
+      "title": "【Phase 2】タイムラインエディタ Step B（音程バー追加）",
+      "phase": "Phase 2",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p2-2": {
+      "title": "【Phase 2】背景動画 & 歌詞デザイン設定画面（素材確定・制作）",
+      "phase": "Phase 2",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p2-3": {
+      "title": "【Phase 2】出力設定画面（AMD AMF / NVENC / QSV / CPU 高画質）",
+      "phase": "Phase 2",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p2-4": {
+      "title": "【Phase 2】FFmpeg MP4 書き出し（ハードウェアエンコードパイプライン）",
+      "phase": "Phase 2",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p3-1": {
+      "title": "【Phase 3】タイムラインエディタ Step C（マーカーレーン・フル機能）",
+      "phase": "Phase 3",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p3-2": {
+      "title": "【Phase 3】プレビュー確認画面（リアルタイム 60fps）",
+      "phase": "Phase 3",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p3-3": {
+      "title": "【Phase 3】環境設定画面（GPU デバイスマネージャー・モデルダウンロード）",
+      "phase": "Phase 3",
+      "completed": false,
+      "completedAt": null
+    },
+    "km-p3-4": {
+      "title": "【Phase 3】Windows インストーラービルド設定",
+      "phase": "Phase 3",
+      "completed": false,
+      "completedAt": null
+    }
+  },
+  "notes": "【仕様書】C:\\Users\\fuuch\\projects\\docs\\karaoke-maker-spec.md (v3.6 最終確定)\n【主軸GPU】AMD Radeon RX 6800 (RDNA 2 / 16GB VRAM)\n【推論】onnxruntime-directml + Whisper ONNX fp16 / stable-ts\n【エンコード】h264_amf (VCN 3.0) + libx264 CPU高画質オプション\n【次アクション】Phase 0 PoC：Electron + Python IPC 通信 + DirectML 推論の最小疎通確認"
+}
