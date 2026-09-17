@@ -1,4 +1,4 @@
-﻿# ============================================
+﻿﻿# ============================================
 # Git Auto-Sync Script (Windows版)
 # PC ↔ Chromebook 自動同期スクリプト
 # ============================================
@@ -32,7 +32,7 @@ function Write-Log {
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     $line = "[$timestamp] $Message"
     Write-Host $line
-    Add-Content -Path $LogFile -Value $line -ErrorAction SilentlyContinue
+    Add-Content -Path $LogFile -Value $line -Encoding utf8 -ErrorAction SilentlyContinue
 }
 
 # ── Pull ──────────────────────────────────
