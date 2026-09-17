@@ -1,5 +1,6 @@
 # Local sync logs
 sync/.git-sync.log
+sync/*.log*
 
 # Binary backups
 backups/*.zip
