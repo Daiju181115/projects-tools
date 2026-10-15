@@ -1,4 +1,4 @@
-﻿# ============================================
+# ============================================
 # Git Auto-Sync Script (Windows版)
 # PC ↔ Chromebook 自動同期スクリプト
 # ============================================
@@ -45,9 +45,12 @@ function Invoke-Pull {
         Push-Location $proj.FullName
 
         try {
-            git fetch origin main 2>$null
+            $branch = git branch --show-current 2>$null
+            if (-not $branch) { $branch = "main" }
+
+            git fetch origin $branch 2>$null
             $localHash = git rev-parse HEAD 2>$null
-            $remoteHash = git rev-parse origin/main 2>$null
+            $remoteHash = git rev-parse "origin/$branch" 2>$null
 
             if ($localHash -eq $remoteHash) {
                 Write-Log "  ✓ ${name}: 最新 (変更なし)"
@@ -64,7 +67,7 @@ function Invoke-Pull {
             }
 
             # Pull
-            $result = git pull --rebase origin main 2>&1
+            $result = git pull --rebase origin $branch 2>&1
             if ($LASTEXITCODE -eq 0) {
                 Write-Log "  ✅ ${name}: 更新を取得しました"
                 $success++
@@ -98,30 +101,42 @@ function Invoke-Push {
         Push-Location $proj.FullName
 
         try {
+            $branch = git branch --show-current 2>$null
+            if (-not $branch) { $branch = "main" }
+
             $status = git status --porcelain
-            if (-not $status) {
+            if ($status) {
+                # 変更の概要
+                $added = ($status | Where-Object { $_ -match '^\?' }).Count
+                $modified = ($status | Where-Object { $_ -notmatch '^\?' }).Count
+                $summary = ""
+                if ($added -gt 0) { $summary += "新規${added}件 " }
+                if ($modified -gt 0) { $summary += "変更${modified}件" }
+
+                # 自動コミット
+                git add -A
+                $deviceName = $env:COMPUTERNAME
+                $dateStr = Get-Date -Format "MM/dd HH:mm"
+                $msg = "🔄 Auto-sync from ${deviceName}: ${summary}($dateStr)"
+                git commit -m $msg 2>$null
+            }
+
+            # リモートより先行しているコミットがあるかチェック
+            $aheadCount = 0
+            $tracking = git rev-parse --abbrev-ref '@{upstream}' 2>$null
+            if ($LASTEXITCODE -eq 0 -and $tracking) {
+                $aheadCount = (git rev-list --count "$tracking..HEAD" 2>$null) -as [int]
+            }
+
+            if (-not $status -and $aheadCount -eq 0) {
                 $skipped++
                 continue
             }
 
-            # 変更の概要
-            $added = ($status | Where-Object { $_ -match '^\?' }).Count
-            $modified = ($status | Where-Object { $_ -notmatch '^\?' }).Count
-            $summary = ""
-            if ($added -gt 0) { $summary += "新規${added}件 " }
-            if ($modified -gt 0) { $summary += "変更${modified}件" }
-
-            # 自動コミット
-            git add -A
-            $deviceName = $env:COMPUTERNAME
-            $dateStr = Get-Date -Format "MM/dd HH:mm"
-            $msg = "🔄 Auto-sync from ${deviceName}: ${summary}($dateStr)"
-            git commit -m $msg 2>$null
-
             # Push
-            $pushResult = git push origin main 2>&1
+            $pushResult = git push origin $branch 2>&1
             if ($LASTEXITCODE -eq 0) {
-                Write-Log "  ✅ ${name}: push完了 ($summary)"
+                Write-Log "  ✅ ${name}: push完了"
                 $pushed++
             } else {
                 Write-Log "  ❌ ${name}: push失敗。git pull を先に試してください"

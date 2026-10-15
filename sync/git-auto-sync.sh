@@ -42,10 +42,13 @@ do_pull() {
     name=$(basename "$proj")
     cd "$proj" || continue
 
+    local branch=$(git branch --show-current 2>/dev/null)
+    [ -z "$branch" ] && branch="main"
+
     # リモートの変更を確認
-    git fetch origin main 2>/dev/null
+    git fetch origin "$branch" 2>/dev/null
     local_hash=$(git rev-parse HEAD 2>/dev/null)
-    remote_hash=$(git rev-parse origin/main 2>/dev/null)
+    remote_hash=$(git rev-parse "origin/$branch" 2>/dev/null)
 
     if [ "$local_hash" = "$remote_hash" ]; then
       log "  ✓ $name: 最新 (変更なし)"
@@ -61,7 +64,7 @@ do_pull() {
     fi
 
     # Pull 実行
-    if git pull --rebase origin main 2>/dev/null; then
+    if git pull --rebase origin "$branch" 2>/dev/null; then
       log "  ✅ $name: 更新を取得しました"
       ((success++))
     else
@@ -93,30 +96,42 @@ do_push() {
     name=$(basename "$proj")
     cd "$proj" || continue
 
-    # 変更チェック（未追跡ファイルも含む）
-    if [ -z "$(git status --porcelain)" ]; then
+    local branch=$(git branch --show-current 2>/dev/null)
+    [ -z "$branch" ] && branch="main"
+
+    local status=$(git status --porcelain)
+
+    # 変更があれば自動コミット
+    if [ -n "$status" ]; then
+      local added=$(echo "$status" | grep "^?" | wc -l)
+      local modified=$(echo "$status" | grep -v "^?" | wc -l)
+      local summary=""
+      [ "$added" -gt 0 ] && summary="${summary}新規${added}件 "
+      [ "$modified" -gt 0 ] && summary="${summary}変更${modified}件"
+
+      git add -A
+      local device_name="Chromebook"
+      [ -f /etc/hostname ] && device_name=$(cat /etc/hostname)
+      local msg="🔄 Auto-sync from ${device_name}: ${summary}($(date '+%m/%d %H:%M'))"
+      
+      git commit -m "$msg" 2>/dev/null
+    fi
+
+    # リモートより先行しているコミットがあるかチェック
+    local ahead_count=0
+    local tracking=$(git rev-parse --abbrev-ref '@{upstream}' 2>/dev/null)
+    if [ -n "$tracking" ]; then
+      ahead_count=$(git rev-list --count "$tracking..HEAD" 2>/dev/null || echo 0)
+    fi
+
+    if [ -z "$status" ] && [ "$ahead_count" -eq 0 ]; then
       ((skipped++))
       continue
     fi
 
-    # 変更の概要を取得
-    local added=$(git status --porcelain | grep "^?" | wc -l)
-    local modified=$(git status --porcelain | grep -v "^?" | wc -l)
-    local summary=""
-    [ "$added" -gt 0 ] && summary="${summary}新規${added}件 "
-    [ "$modified" -gt 0 ] && summary="${summary}変更${modified}件"
-
-    # 自動コミット
-    git add -A
-    local device_name="Chromebook"
-    [ -f /etc/hostname ] && device_name=$(cat /etc/hostname)
-    local msg="🔄 Auto-sync from ${device_name}: ${summary}($(date '+%m/%d %H:%M'))"
-    
-    git commit -m "$msg" 2>/dev/null
-
     # Push
-    if git push origin main 2>/dev/null; then
-      log "  ✅ $name: push完了 ($summary)"
+    if git push origin "$branch" 2>/dev/null; then
+      log "  ✅ $name: push完了"
       ((pushed++))
     else
       log "  ❌ $name: push失敗。git pull を先に試してください"
