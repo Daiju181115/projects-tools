@@ -101,6 +101,16 @@ do_push() {
 
     local status=$(git status --porcelain)
 
+    # 未解決コンフリクトの安全ガード
+    if echo "$status" | grep -qE '^([UDA][UDA]|AA|DD)'; then
+      log "  ❌ $name: 未解決のコンフリクトがあります！pushをスキップします (手動で解決してください)"
+      continue
+    fi
+    if git grep -qE '<<<<<<< (Updated upstream|HEAD)' 2>/dev/null; then
+      log "  ❌ $name: コンフリクトマーカーが残っています！pushをスキップします"
+      continue
+    fi
+
     # 変更があれば自動コミット
     if [ -n "$status" ]; then
       local added=$(echo "$status" | grep "^?" | wc -l)

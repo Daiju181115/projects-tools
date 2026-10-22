@@ -1,4 +1,4 @@
-﻿# ============================================
+# ============================================
 # Git Auto-Sync Script (Windows版)
 # PC ↔ Chromebook 自動同期スクリプト
 # ============================================
@@ -106,6 +106,17 @@ function Invoke-Push {
 
             $status = git status --porcelain
             if ($status) {
+                # 未解決コンフリクトの安全ガード
+                if ($status | Where-Object { $_ -match '^([UDA][UDA]|AA|DD)' }) {
+                    Write-Log "  ❌ ${name}: 未解決のコンフリクトがあります！pushをスキップします"
+                    continue
+                }
+                git grep -qE '<<<<<<< (Updated upstream|HEAD)' 2>$null
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Log "  ❌ ${name}: コンフリクトマーカーが残っています！pushをスキップします"
+                    continue
+                }
+
                 # 変更の概要
                 $added = ($status | Where-Object { $_ -match '^\?' }).Count
                 $modified = ($status | Where-Object { $_ -notmatch '^\?' }).Count
